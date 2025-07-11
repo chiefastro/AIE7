@@ -1,2 +1,5 @@
 .DS_Store
 .env
+*uv.lock
+*.venv
+*.ipynb_checkpoints
