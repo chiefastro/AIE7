@@ -54,3 +54,7 @@ The prompts are designed to encourage users to ask questions in a way that lever
 ### Chunking Strategy
 - **Default:** Custom chunker that leverages structure of markdown. Separates paragraphs, bullet points, rows of tables but keeps headings for each (contextual retrieval)
 - **Rationale:** The blog article is short and dense (short paragraphs, bullets, and tables). Naive chunkers might mix multiple mental models together into one chunk.
+
+
+# Notes
+I want to redesign this agent. The supervisor that delegates to 3 subagents, each of whom has 1 tool, is more complex and less effective than a simpler single agent with access to 3 tools because that simple agent can do it's own planning, delegation, and synthesis while the supervisor design can only delegate with no planning and synthesis.

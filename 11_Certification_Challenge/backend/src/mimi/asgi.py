@@ -12,6 +12,7 @@ from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 
 from mimi.agents.supervisor import create_supervisor_graph
+from mimi.agents.multi_tasker import create_multi_tasker_graph
 from mimi.config.cors import ALLOWED_ORIGINS, ALLOWED_METHODS, ALLOWED_HEADERS
 
 load_dotenv()
@@ -94,9 +95,14 @@ sdk = CopilotKitRemoteEndpoint(
     agents=[
         # Register the LangGraph agent using the LangGraphAgent class
         LangGraphAgent(
+            name="MimiTeam",
+            description="Mimi Team can help you develop an AI strategy for your business.",
+            graph=create_supervisor_graph()
+        ),
+        LangGraphAgent(
             name="Mimi",
             description="Mimi can help you develop an AI strategy for your business.",
-            graph=create_supervisor_graph()
+            graph=create_multi_tasker_graph()
         ),
     ]
 )
