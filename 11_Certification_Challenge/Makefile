@@ -5,7 +5,7 @@ help:
 	@echo "Available commands:"
 	@echo "  build     - Build the Docker image"
 	@echo "  run       - Run the service using Docker Compose"
-	@echo "  populate  - Populate the vector database"
+	@echo "  populate  - Populate the vector database for all chunker types"
 	@echo "  clean     - Stop and remove containers"
 	@echo "  logs      - View service logs"
 
@@ -17,9 +17,9 @@ build:
 up:
 	docker-compose up
 
-# Populate the vector database
+# Populate the vector database for all chunker types
 populate:
-	docker-compose run --rm mimi-backend uv run python -m mimi.pipe.pipe
+	docker-compose run --rm mimi-backend uv run python -m mimi.pipe.populate_all
 
 # Stop and remove containers
 clean:

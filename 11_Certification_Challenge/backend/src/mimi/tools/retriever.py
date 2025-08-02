@@ -3,14 +3,14 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_openai.embeddings import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 
-from mimi.config.vector import COLLECTION_NAME, PERSIST_DIR, EMBEDDING_MODEL
+from backend.src.mimi.config.vectors import PERSIST_DIR, EMBEDDING_MODEL
+from backend.src.mimi.config.variants import get_variants
 
-def get_retriever(collection_name=COLLECTION_NAME, persist_dir=PERSIST_DIR, **kwargs):
+def get_retriever(persist_dir=PERSIST_DIR, **kwargs):
     """
     Get a retriever from the pre-populated Qdrant vector database.
     
     Args:
-        collection_name: Name of the Qdrant collection
         persist_dir: Directory where the vector database is stored
         **kwargs: Additional arguments to pass to as_retriever()
     
@@ -18,6 +18,10 @@ def get_retriever(collection_name=COLLECTION_NAME, persist_dir=PERSIST_DIR, **kw
         A retriever instance
     """
     embedding_model = OpenAIEmbeddings(model=EMBEDDING_MODEL)
+    
+    # Get collection name from variants config
+    variants = get_variants()
+    collection_name = variants.chunker_type.value
     
     # Connect to existing vector store
     client = QdrantClient(path=persist_dir)

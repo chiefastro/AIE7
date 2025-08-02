@@ -3,6 +3,7 @@ import re
 from typing import List, Dict, Any
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
+from mimi.config.variants import ChunkerType
 
 def tiktoken_len(text):
     tokens = tiktoken.encoding_for_model("gpt-4o").encode(
@@ -191,6 +192,14 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_overlap = 0,
     length_function = tiktoken_len,
 )
+
+def get_chunker(chunker_type: ChunkerType):
+    if chunker_type == ChunkerType.MARKDOWN_CHUNKER:
+        return markdown_chunker
+    elif chunker_type == ChunkerType.NAIVE_CHUNKER:
+        return text_splitter
+    else:
+        raise ValueError(f"Invalid chunker type: {chunker_type}")
 
 
 def test_chunker():
