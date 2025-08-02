@@ -1,6 +1,6 @@
 from pathlib import Path
 from mimi.pipe.load import load_documents
-from mimi.pipe.chunk import text_splitter
+from mimi.pipe.chunk import markdown_chunker
 from mimi.pipe.index import index
 from dotenv import load_dotenv
 
@@ -11,7 +11,8 @@ def pipe(docs):
     docs = load_documents(docs)
     print(f"Documents loaded: {len(docs)}")
     
-    chunks = text_splitter.split_documents(docs)
+    # Use custom markdown-aware chunking
+    chunks = markdown_chunker.split_documents(docs)
     print(f"Chunks created: {len(chunks)}")
     
     if len(chunks) == 0:
