@@ -12,3 +12,14 @@ package-lock.json
 yarn.lock
 .pnp.*
 *.next
+
+# python stuff
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.pyw
+**/*.pyz
+**/*.pywz
+**/*.pyzw
+**/*.pyzwz

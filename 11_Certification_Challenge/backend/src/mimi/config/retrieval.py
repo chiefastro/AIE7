@@ -1,0 +1,1 @@
+PERSIST_DIR = "vector_db"

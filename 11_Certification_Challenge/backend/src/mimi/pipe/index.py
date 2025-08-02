@@ -1,7 +1,8 @@
 from langchain_community.vectorstores import Qdrant
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from mimi.config.vectors import PERSIST_DIR, EMBEDDING_MODEL
+from mimi.config.retrieval import PERSIST_DIR
+from mimi.config.models import EMBEDDING_MODEL
 from mimi.config.variants import variants
 
 def index(chunks):

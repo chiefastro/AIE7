@@ -1,3 +1,5 @@
 SUPERVISOR_MODEL_NAME = "gpt-4.1"
 SUBAGENT_MODEL_NAME = "gpt-4.1-mini"
 RAG_MODEL_NAME = "gpt-4.1-nano"
+MULTI_QUERY_LLM_MODEL = "gpt-4.1-nano"
+EMBEDDING_MODEL = "text-embedding-3-small"

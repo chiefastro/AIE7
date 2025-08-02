@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Optional, Dict, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import threading
+
+from mimi.config.variant_defaults import AGENT_TYPE, CHUNKER_TYPE, RETRIEVER_TYPE
 
 class AgentType(Enum):
     SUPERVISOR = "supervisor"
@@ -53,9 +55,16 @@ class ExperimentVariants:
         self._initialized = True
     
     def get_config(self) -> ExperimentConfig:
-        """Get the current config"""
+        """Get the current config, using defaults if not initialized"""
         if not self._initialized or self._config is None:
-            raise RuntimeError("Config not initialized. Call initialize() first.")
+            # Create default config from variant_defaults.py
+            print(f"Creating default config from variant_defaults.py: {AGENT_TYPE}, {CHUNKER_TYPE}, {RETRIEVER_TYPE}")
+            default_config = ExperimentConfig(
+                agent_type=AgentType(AGENT_TYPE),
+                chunker_type=ChunkerType(CHUNKER_TYPE),
+                retriever_type=RetrieverType(RETRIEVER_TYPE)
+            )
+            return default_config
         return self._config
     
     def reset(self) -> None:
@@ -74,6 +83,6 @@ class ExperimentVariants:
     @property
     def retriever_type(self) -> RetrieverType:
         return self.get_config().retriever_type
-    
+
 # Global instance
 variants = ExperimentVariants()
