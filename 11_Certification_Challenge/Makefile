@@ -21,6 +21,14 @@ up:
 populate:
 	docker-compose run --rm mimi-backend uv run python -m mimi.pipe.populate_all
 
+# Generate SDG testset
+sdg:
+	docker-compose run --rm mimi-backend uv run python -m mimi.evals.sdg
+
+# Run experiment
+experiment:
+	docker-compose run --rm mimi-backend uv run python -m mimi.evals.run_experiment
+
 # Stop and remove containers
 clean:
 	docker-compose down

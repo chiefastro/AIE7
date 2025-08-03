@@ -8,14 +8,18 @@ logger = logging.getLogger(__name__)
 
 
 def agent_node(state, config, agent, name):
+    """Agent node that also populates response and context fields"""
     logger.info(f"Agent {name} invoked with state: {state}")
     result = agent.invoke(state, config=config)
+    
     if name == "Supervisor":
         logger.info(f"Next role: {result['next']}")
         return {"next": result["next"]}
     else:
         logger.info(f"Agent {name} completed with output: {result['output'][:100]}...")
-        return {"messages": [AIMessage(content=result["output"], name=name)]}
+        messages = [AIMessage(content=result["output"], name=name)]
+        state_new = {"messages": messages}
+        return state_new
 
 
 def create_agent(

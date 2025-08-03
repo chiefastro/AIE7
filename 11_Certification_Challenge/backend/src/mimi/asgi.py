@@ -11,9 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 
-from mimi.config.variants import variants, AgentType
-from mimi.agents.supervisor import create_supervisor_graph
-from mimi.agents.multi_tasker import create_multi_tasker_graph
+from mimi.agents import get_agent_graph
 from mimi.config.cors import ALLOWED_ORIGINS, ALLOWED_METHODS, ALLOWED_HEADERS
 
 load_dotenv()
@@ -91,18 +89,13 @@ async def logging_middleware(request: Request, call_next: Callable) -> Response:
 print("✅ Logging middleware added successfully")  # Debug print
 logger.info("✅ Logging middleware added successfully")
 
-if variants.agent_type == AgentType.SUPERVISOR:
-    agent_graph = create_supervisor_graph()
-elif variants.agent_type == AgentType.MULTI_TASKER:
-    agent_graph = create_multi_tasker_graph()
-
 sdk = CopilotKitRemoteEndpoint(
     agents=[
         # Register the LangGraph agent using the LangGraphAgent class
         LangGraphAgent(
             name="Mimi",
             description="Mimi can help you develop an AI strategy for your business.",
-            graph=agent_graph
+            graph=get_agent_graph()
         ),
     ]
 )

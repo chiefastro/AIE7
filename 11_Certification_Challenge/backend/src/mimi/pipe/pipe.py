@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def pipe(docs):
-    print(f"Starting pipeline with docs path: {docs}")
-    docs = load_documents(docs)
+def pipe(path: Path):
+    # Load documents
+    print(f"Starting pipeline with docs path: {path}")
+    docs = load_documents(path)
     print(f"Documents loaded: {len(docs)}")
     
     # Get chunker type from variants config
@@ -23,11 +24,9 @@ def pipe(docs):
     chunks = chunker.split_documents(docs)
     print(f"Chunks created: {len(chunks)}")
     
-    if len(chunks) == 0:
-        print("ERROR: No chunks created! This will cause the embedding error.")
-        return None
-        
+    # Index the chunks
     vectorstore = index(chunks)
+
     return vectorstore
 
 if __name__ == "__main__":
