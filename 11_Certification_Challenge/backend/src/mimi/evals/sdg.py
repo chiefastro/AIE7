@@ -11,7 +11,7 @@ import os
 
 load_dotenv()
 
-def generate_sdg_testset(dataset, testset_size=20):
+def generate_sdg_testset(dataset, testset_size=100):
     generator_llm = LangchainLLMWrapper(ChatOpenAI(model=SDG_LLM_MODEL))
     generator_embeddings = LangchainEmbeddingsWrapper(OpenAIEmbeddings())
 

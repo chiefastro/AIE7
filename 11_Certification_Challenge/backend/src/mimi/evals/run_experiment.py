@@ -3,78 +3,70 @@
 Example usage of the simple variants configuration system.
 """
 
-from mimi.config.variants import (
-    ExperimentConfig, 
-    AgentType, 
-    ChunkerType, 
-    RetrieverType, 
-    variants
-)
-from mimi.evals.ragas_eval import run_ragas_eval
-import itertools
-from mimi.agents.rag import create_rag_graph
+from mimi.evals.ragas_eval import generate_all_invocables, get_langsmith_stats, run_ragas_eval_parallel, get_score_df
 from mimi.evals.ragas_csv_loader import load_ragas_csv
+from IPython.display import display
+import uuid
+import os
+from pathlib import Path
+import pandas as pd
 
-def run_experiment(experiment_name: str, config: ExperimentConfig):
-    """Example experiment runner"""
-    print(f"\n🧪 Running experiment: {experiment_name}")
-    print(f"Config: {config.to_dict()}")
-    
-    # Initialize the global config
-    variants.initialize(config)
-    
-    # Now any code can access the config like this:
-    print(f"Chunker type: {variants.chunker_type.value}")
-    print(f"Retriever: {variants.retriever_type.value}")
-
-    # Get agent graph
-    agent_graph = create_rag_graph()
-
-    # Load dataset
-    dataset = load_ragas_csv(f"./data/sdg/testset.csv")
-
-    # Run the experiment
-    run_ragas_eval(agent_graph, experiment_name, dataset)
-    
-    # Reset for next experiment
-    variants.reset()
-
-def generate_all_combinations():
-    """Generate all possible combinations of variants"""
-    configs = []
-    
-    # Get all enum values
-    chunker_types = list(ChunkerType)
-    retriever_types = list(RetrieverType)
-    
-    # Generate all combinations
-    for chunker_type, retriever_type in itertools.product(
-        chunker_types, retriever_types
-    ):
-        config = ExperimentConfig(
-            agent_type=AgentType.MULTI_TASKER,
-            chunker_type=chunker_type,
-            retriever_type=retriever_type
-        )
-        configs.append(config)
-    
-    return configs
 
 def main():
     """Example of running different experiment variants"""
+
+    # data path
+    data_path = Path("./data")
+    os.makedirs(data_path / "experiments", exist_ok=True)
+    
+    print("Starting experiment...")
     
     # Generate all combinations
-    all_configs = generate_all_combinations()
-    
-    print(f"Generated {len(all_configs)} experiment configurations:")
-    print("=" * 60)
-    
+    invocables = generate_all_invocables()
+    print(f"Generated {len(invocables)} invocables")
+
+    # Load dataset
+    dataset = load_ragas_csv(data_path / "sdg" / "testset.csv")
+    print(f"Loaded dataset with {len(dataset)} samples")
+
+    # Generate an experiment id
+    experiment_id = str(uuid.uuid4())
+    print(f"Experiment ID: {experiment_id}")
+
     # Run all experiments
-    for i, config in enumerate(all_configs[0:1], 1):
-        experiment_name = f"Experiment_{i:02d}_{config.chunker_type.value}_{config.retriever_type.value}"
-        run_experiment(experiment_name, config)
+    print("Running experiments...")
+    results_d = run_ragas_eval_parallel(invocables, dataset, experiment_id)
+    print("Experiments completed")
+
+    # Format results
+    score_df = get_score_df(results_d)
+    print(f"Generated score dataframe with shape: {score_df.shape}")
+
+    # Save results
+    score_df.to_csv(data_path / "experiments" / f"score_df_{experiment_id}.csv", index=False)
+    print(f"Saved results to: {data_path / 'experiments' / f'score_df_{experiment_id}.csv'}")
+
+    # Analyze results
+    print("Analyzing results...")
+    score_aggs = score_df.groupby('experiment_name').mean()
+    langsmith_df = get_langsmith_stats(experiment_id)
+    score_aggs_combined = pd.concat([score_aggs, -langsmith_df[['latency_p50', 'latency_p99', 'cost_p50', 'cost_p99']]], axis=1)
+    print("Eval rankings:")
+    display(score_aggs_combined.rank(ascending=False))
+    print("Aggregated rankings for evals only:")
+    display(score_aggs.rank(ascending=False).mean(axis=1).sort_values(ascending=True))
+    print("Aggregated rankings for cost/latency only:")
+    display((-langsmith_df[['latency_p50', 'latency_p99', 'cost_p50', 'cost_p99']]).rank(ascending=False).mean(axis=1).sort_values(ascending=True))
+    print("Final ranking: Aggregated rankings for both evals and cost/latency:")
+    display(score_aggs_combined.rank(ascending=False).mean(axis=1).sort_values(ascending=True))
+
+    # Save combined results
+    score_aggs_combined.to_csv(data_path / "experiments" / f"score_aggs_combined_{experiment_id}.csv")
+    print(f"Saved combined results to: {data_path / 'experiments' / f'score_aggs_combined_{experiment_id}.csv'}")
+
+    # Return score dataframe
+    return {"score_df" : score_df, "score_aggs_combined" : score_aggs_combined}
     
-    print(f"\n✅ Completed {len(all_configs)} experiments!")
 
 if __name__ == "__main__":
     main() 
