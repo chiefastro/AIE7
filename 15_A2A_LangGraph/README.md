@@ -87,9 +87,29 @@ Do this by creating a Simple Agent that can make API calls to the 🤖Agent Node
 
 What are the core components of an `AgentCard`?
 
+
+### Answer:
+
+- **Identity**: `name`, `description`, `version`, `url`
+- **Capabilities**: `AgentCapabilities` (e.g., `streaming`, `push_notifications`)
+- **I/O Modes**: `default_input_modes`, `default_output_modes` (supported content types)
+- **Skills**: List of `AgentSkill` items (`id`, `name`, `description`, `tags`, `examples`)
+- **(Optional) Extended Card Support**: `supports_authenticated_extended_card` indicating an authenticated, richer card is available
+
+
 ### ❓ Question #2:
 
 Why is A2A (and other such protocols) important in your own words?
+
+
+### Answer:
+
+- **Interoperability**: A common protocol lets any compliant client call any compliant agent without bespoke adapters.
+- **Discoverability**: The `AgentCard` acts as a self-describing contract (capabilities, I/O modes, skills) at a well-known path.
+- **Composability**: Encourages building systems from specialized agents that can call each other reliably.
+- **Operational clarity**: Standardizes task state, streaming, and push notifications for better reliability and monitoring.
+- **Governance & safety**: Makes it explicit what an agent can do and how it should be used (auth, modes, limits), easing security reviews.
+
 
 ### 🚧 Advanced Build:
 
